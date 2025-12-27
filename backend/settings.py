@@ -85,12 +85,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+DATABASES = {}
 
 
 # Password validation
@@ -123,7 +118,7 @@ USE_I18N = True
 USE_TZ = True
 
 # STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MIDDLEWARE.insert(
     1, "whitenoise.middleware.WhiteNoiseMiddleware"
@@ -132,12 +127,15 @@ MIDDLEWARE.insert(
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
 CORS_ALLOW_ALL_ORIGINS = True
-
-ALLOWED_HOSTS = ["*"]
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 CSRF_TRUSTED_ORIGINS = ["https://*.vercel.app"]
 
+ALLOWED_HOSTS = ["*"]
+DEBUG = False
+
+# Static files
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
