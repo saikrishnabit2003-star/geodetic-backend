@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .utils import parse_stacov_file
 from django.http import JsonResponse
+from django.conf import settings
 
 def ping(request):
     return JsonResponse({"message": "STACOV API working"})
@@ -17,19 +18,31 @@ class StacovByDateAPIView(APIView):
     def get(self, request):
         date_str = request.query_params.get("date")
         if not date_str:
-            return Response({"error": "date required (YYYY-MM-DD)"},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "date required (YYYY-MM-DD)"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
-            # ⚡ Parse frontend date YYYY-MM-DD
             date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-            # ⚡ Convert to filename format: YYMMMDD
-            file_date = f"{str(date_obj.year % 100).zfill(2)}{date_obj.strftime('%b').lower()}{str(date_obj.day).zfill(2)}"
+            file_date = (
+                f"{str(date_obj.year % 100).zfill(2)}"
+                f"{date_obj.strftime('%b').lower()}"
+                f"{str(date_obj.day).zfill(2)}"
+            )
         except ValueError:
             return Response({"error": "Invalid date format"}, status=400)
 
+        stacov_dir = os.path.joinsettings.BASE_DIR, "stacov", "stacov_files")
+
+        if not os.path.exists(stacov_dir):
+            return Response(
+                {"error": "STACOV directory not found"},
+                status=500
+            )
+
         matched_file = None
-        for file in os.listdir(STACOV_DIR):
+        for file in os.listdir(stacov_dir):
             if file.startswith(file_date):
                 matched_file = file
                 break
@@ -37,10 +50,9 @@ class StacovByDateAPIView(APIView):
         if not matched_file:
             return Response({"error": "STACOV file not found"}, status=404)
 
-        file_path = os.path.join(STACOV_DIR, matched_file)
+        file_path = os.path.join(stacov_dir, matched_file)
         stations = parse_stacov_file(file_path)
 
-        # ⚡ Convert stations to GeoJSON
         geojson = {
             "type": "FeatureCollection",
             "features": [
