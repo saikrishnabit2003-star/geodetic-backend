@@ -4,6 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .utils import parse_stacov_file
+from django.http import JsonResponse
+
+def ping(request):
+    return JsonResponse({"message": "STACOV API working"})
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STACOV_DIR = os.path.join(BASE_DIR, "stacov", "stacov_files")
