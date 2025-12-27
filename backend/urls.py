@@ -2,10 +2,10 @@
 from django.urls import path, include
 from django.http import JsonResponse
 
-# def health(request):
-#     return JsonResponse({"status": "ok", "service": "django-api"})
+def health(request):
+    return JsonResponse({"status": "ok", "service": "django-api"})
 
 urlpatterns = [
-    # path("", health),
-    path("", include("stacov.urls")),
+    path("", health),
+    path("api/", include("stacov.urls")),
 ]
